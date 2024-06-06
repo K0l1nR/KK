@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateEventDto, EventDto, UpdateEventDto } from './dto';
 import { EventEntity } from 'src/entity/event.entity';
+import { RegistrationEntity } from 'src/entity/registration.entity';
+import { ParticipantEntity } from 'src/entity/participant.entity';
 
 @Injectable()
 export class EventService {
   constructor(
     @InjectRepository(EventEntity)
     private readonly eventRepository: Repository<EventEntity>,
+    @InjectRepository(RegistrationEntity)
+    private readonly registrationRepository: Repository<RegistrationEntity>,
   ) {}
 
 
@@ -48,5 +52,14 @@ export class EventService {
 
   async remove(id: string): Promise<void> {
     await this.eventRepository.delete(id);
+  }
+
+  async countParticipants(eventId: string): Promise<number> {
+    return await this.registrationRepository.count({ where: { event: { id: eventId } } });
+  }
+
+  async getParticipants(eventId: string): Promise<ParticipantEntity[]> {
+    const registrations = await this.registrationRepository.find({ where: { event: { id: eventId } }, relations: ['participant'] });
+    return registrations.map(registration => registration.participant);
   }
 }

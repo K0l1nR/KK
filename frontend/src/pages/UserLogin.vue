@@ -1,0 +1,61 @@
+<template>
+  <q-page class="flex flex-center q-pa-md">
+    <q-card class="q-pa-md" style="width: 400px; max-width: 100%;">
+      <q-card-section>
+        <div class="text-h6 q-mb-md">Авторизация</div>
+      </q-card-section>
+
+      <q-card-section>
+        <q-form @submit.prevent="login">
+          <q-input v-model="email" label="Электроная почта" outlined class="q-mb-md" />
+          <q-input v-model="password" label="Пароль" type="password" outlined class="q-mb-md" />
+
+          <q-btn type="submit" label="Авторизация" color="primary" class="full-width q-mt-md" />
+        </q-form>
+      </q-card-section>
+    </q-card>
+  </q-page>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import { api } from 'src/boot/axios';
+
+export default defineComponent({
+  name: 'UserLogin',
+  setup() {
+    const email = ref('');
+    const password = ref('');
+    const store = useStore();
+    const router = useRouter();
+
+    const login = async () => {
+      try {
+        const response = await api.post('/participant/login', {
+          email: email.value,
+          password: password.value
+        });
+        store.dispatch('login', response.data.accessToken);
+        console.log('Login successful', response.data);
+        router.push('/events');
+      } catch (error) {
+        console.error('Login failed', error);
+      }
+    };
+
+    return {
+      email,
+      password,
+      login
+    };
+  }
+});
+</script>
+
+<style scoped>
+.full-width {
+  width: 100%;
+}
+</style>

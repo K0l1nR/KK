@@ -139,7 +139,7 @@ export class ParticipantService {
     }
 
     const registration = this.registrationRepository.create({
-      participant,
+      participant : {id : participant.id},
       event,
       registrationDate: new Date()
     });

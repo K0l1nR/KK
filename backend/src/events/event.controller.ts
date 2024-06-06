@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Query, ParseUUIDPipe } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { ApiTags } from '@nestjs/swagger';
+import { ParticipantEntity } from 'src/entity/participant.entity';
 
 @ApiTags('Event')
 @Controller('event')
@@ -31,5 +32,15 @@ export class EventController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.eventService.remove(id);
+  }
+
+  @Get(':id/participant/count')
+  async countParticipants(@Param('id', ParseUUIDPipe) eventId: string): Promise<number> {
+    return this.eventService.countParticipants(eventId);
+  }
+
+  @Get(':id/participant')
+  async getParticipants(@Param('id', ParseUUIDPipe) eventId: string): Promise<ParticipantEntity[]> {
+    return this.eventService.getParticipants(eventId);
   }
 }
